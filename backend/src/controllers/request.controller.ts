@@ -41,7 +41,7 @@ export const createBloodRequest = async (req: AuthenticatedRequest, res: Respons
     const docRef = await db.collection('blood_requests').add(requestData);
     const savedData = { id: docRef.id, ...requestData };
 
-    
+
     io.emit('new_emergency_request', savedData);
 
     res.status(201).json({
@@ -64,21 +64,22 @@ export const getBloodRequests = async (req: AuthenticatedRequest, res: Response)
 
   try {
     let query: any = db.collection('blood_requests');
-    
+
     if (status !== 'ALL') {
       query = query.where('status', '==', status);
     }
-    
-    if (bloodType) {
-      query = query.where('bloodType', '==', bloodType);
-    }
 
+    // bloodType filtered in-memory to avoid composite Firestore index requirement
     const snapshot = await query.orderBy('createdAt', 'desc').get();
-    const requests: any[] = [];
-    
+    let requests: any[] = [];
+
     snapshot.forEach((doc: any) => {
       requests.push({ id: doc.id, ...doc.data() });
     });
+
+    if (bloodType) {
+      requests = requests.filter((r: any) => r.bloodType === bloodType);
+    }
 
     res.status(200).json({
       status: 'success',
@@ -91,6 +92,7 @@ export const getBloodRequests = async (req: AuthenticatedRequest, res: Response)
       message: 'Failed to query blood requests.'
     });
   }
+
 };
 
 
@@ -137,7 +139,7 @@ export const acceptBloodRequest = async (req: AuthenticatedRequest, res: Respons
 
     const updatedResponse = { id, ...requestData, ...updateData };
 
-    
+
     io.to(requestData.createdById).emit('request_accepted', {
       requestId: id,
       donorId,
@@ -189,7 +191,7 @@ export const updateRequestStatus = async (req: AuthenticatedRequest, res: Respon
     }
 
     const requestData = requestDoc.data()!;
-    
+
     if (requestData.createdById !== req.user.uid && requestData.acceptedById !== req.user.uid && req.user.role !== 'ADMIN') {
       res.status(403).json({
         status: 'error',
@@ -202,7 +204,7 @@ export const updateRequestStatus = async (req: AuthenticatedRequest, res: Respon
 
     const updatedResponse = { id, ...requestData, status };
 
-    
+
     io.to(requestData.createdById).emit('request_status_updated', updatedResponse);
     if (requestData.acceptedById) {
       io.to(requestData.acceptedById).emit('request_status_updated', updatedResponse);

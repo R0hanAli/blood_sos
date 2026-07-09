@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
+import 'package:flutter/foundation.dart';
 import 'package:blood_sos/core/network/api_client.dart';
 import 'package:blood_sos/core/services/storage_service.dart';
 import '../../domain/entities/user_entity.dart';
+import '../../domain/entities/user_role.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../models/user_model.dart';
 
@@ -52,10 +54,28 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       await _storageService.saveAuthToken(token);
-      final userEntity = await getMe();
-      await _storageService.saveUserRole(userEntity.role.key);
 
-      return userEntity;
+      // --- Fetch profile from backend (non-fatal if server is unreachable) ---
+      try {
+        final userEntity = await getMe();
+        await _storageService.saveUserRole(userEntity.role.key);
+        return userEntity;
+      } catch (backendError) {
+        if (backendError is Failure && backendError is! NetworkFailure) {
+          rethrow;
+        }
+        debugPrint(
+          '[AuthRepo] Backend unreachable after Firebase login. '
+          'Using stored role fallback. Error: $backendError',
+        );
+        final storedRole = _storageService.getUserRole() ?? 'DONOR';
+        return UserEntity(
+          uid: user.uid,
+          email: user.email ?? email,
+          role: UserRole.fromString(storedRole),
+          status: 'active',
+        );
+      }
     } on firebase.FirebaseAuthException catch (e) {
       throw AuthFailure(_mapFirebaseError(e.code));
     } catch (e) {
@@ -120,26 +140,49 @@ class AuthRepositoryImpl implements AuthRepository {
 
       await _storageService.saveAuthToken(token);
 
-      final response = await _apiClient.post(
-        '/auth/register',
-        data: {
-          'role': role,
-          'fullName': fullName,
-          'phone': phone,
-          ...?extraDetails,
-        },
-      );
+      // --- Sync with backend (non-fatal if server is unreachable) ---
+      try {
+        final response = await _apiClient.post(
+          '/auth/register',
+          data: {
+            'role': role,
+            'fullName': fullName,
+            'phone': phone,
+            ...?extraDetails,
+          },
+        );
 
-      if (response.statusCode != 201) {
-        await user.delete();
-        await _storageService.clearAll();
-        throw ServerFailure(response.data['message'] ?? 'Database synchronization failed.');
+        if (response.statusCode != 201) {
+          await user.delete();
+          await _storageService.clearAll();
+          throw ServerFailure(response.data['message'] ?? 'Database synchronization failed.');
+        }
+
+        final registeredUser = UserModel.fromJson(response.data['data']).toEntity();
+        await _storageService.saveUserRole(registeredUser.role.key);
+        return registeredUser;
+      } catch (backendError) {
+        if (backendError is Failure && backendError is! NetworkFailure) {
+          // Real server error (e.g. 400/500) — propagate it and roll back Firebase user.
+          await user.delete();
+          await _storageService.clearAll();
+          rethrow;
+        }
+        // Network/timeout — Firebase account exists; navigate with local entity.
+        debugPrint(
+          '[AuthRepo] Backend unreachable after Firebase registration. '
+          'Using local fallback entity. Error: $backendError',
+        );
+        final fallbackUser = UserEntity(
+          uid: user.uid,
+          email: user.email ?? email,
+          role: UserRole.fromString(role),
+          status: 'active',
+          profile: {'fullName': fullName, 'phone': phone, ...?extraDetails},
+        );
+        await _storageService.saveUserRole(fallbackUser.role.key);
+        return fallbackUser;
       }
-
-      final registeredUser = UserModel.fromJson(response.data['data']).toEntity();
-      await _storageService.saveUserRole(registeredUser.role.key);
-
-      return registeredUser;
     } on firebase.FirebaseAuthException catch (e) {
       throw AuthFailure(_mapFirebaseError(e.code));
     } catch (e) {

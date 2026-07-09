@@ -6,18 +6,33 @@ import 'package:blood_sos/core/errors/failures.dart';
 export 'package:dio/dio.dart';
 export 'package:blood_sos/core/errors/failures.dart';
 
+// ─── Server URL Configuration ────────────────────────────────────────────────
+// • Emulator (Android):  10.0.2.2  (maps to host localhost)
+// • Real device:         your PC's LAN IP, e.g. 192.168.1.5
+//   Run `ipconfig` (Windows) or `ifconfig` (Mac/Linux) to find it.
+// • Production:         https://your-production-domain.com
+//
+// Change the value below to match your current testing environment:
+const String _kDevServerIp = '192.168.1.4'; // ← Your PC's LAN IP (from ipconfig)
+const int _kDevServerPort = 3000;
+
+String _resolveBaseUrl() {
+  if (kIsWeb) return 'http://localhost:$_kDevServerPort/api';
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    // 10.0.2.2 only works on the Android *emulator*.
+    // For a real device, swap to your LAN IP (_kDevServerIp).
+    return 'http://$_kDevServerIp:$_kDevServerPort/api';
+  }
+  return 'http://localhost:$_kDevServerPort/api';
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 class ApiClient {
   final Dio _dio;
   final StorageService _storageService;
 
   ApiClient(this._dio, this._storageService) {
-    if (kIsWeb) {
-      _dio.options.baseUrl = 'http://localhost:3000/api';
-    } else {
-      _dio.options.baseUrl = defaultTargetPlatform == TargetPlatform.android
-          ? 'http://10.0.2.2:3000/api'
-          : 'http://localhost:3000/api';
-    } 
+    _dio.options.baseUrl = _resolveBaseUrl();
     _dio.options.connectTimeout = const Duration(seconds: 15);
     _dio.options.receiveTimeout = const Duration(seconds: 15);
     
