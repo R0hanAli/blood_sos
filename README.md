@@ -206,3 +206,83 @@ Request location
 Contact information
 
 Request status
+
+⚡ Real-Time Communication
+
+BloodSOS uses Socket.io to provide real-time communication between the backend and connected Flutter clients.
+
+When an emergency blood request is created, the backend can notify relevant connected users without requiring the application to repeatedly refresh the request list.
+
+Hospital / Patient
+       │
+       ↓
+Create Emergency Request
+       │
+       ↓
+Node.js API
+       │
+       ↓
+Socket.io Server
+       │
+       ├───────────────┐
+       ↓               ↓
+Eligible Donor A   Eligible Donor B
+       │               │
+       └───────┬───────┘
+               ↓
+        Real-Time Alert
+
+This real-time architecture is particularly useful for emergency scenarios where response time matters.
+
+📍 Location & Geolocation
+
+BloodSOS incorporates location-aware functionality to help users understand where emergency requests are located.
+
+The application can provide:
+
+Request locations
+
+Geographic proximity information
+
+Map-based request discovery
+
+Location-aware donor discovery
+
+Dynamic request positioning
+
+The location system can help donors identify emergency requests that are geographically relevant to them.
+
+🗺️ Maps & Request Discovery
+
+Emergency requests can be presented using location-based interfaces.
+
+A typical discovery flow:
+
+Current User Location
+        ↓
+Fetch Emergency Requests
+        ↓
+Determine Request Locations
+        ↓
+Calculate / Display Proximity
+        ↓
+Show Relevant Requests
+        ↓
+Open Request Details
+
+🔐 Authentication & Authorization
+
+Firebase Authentication provides the client-side authentication layer.
+
+BloodSOS supports structured registration flows for different user roles.
+
+                 Authentication
+                       │
+          ┌────────────┼────────────┐
+          ↓            ↓            ↓
+       Donor         Patient      Hospital
+          │            │            │
+          ↓            ↓            ↓
+     Donor Flow    Patient Flow   Hospital Flow
+
+The backend uses the Firebase Admin SDK to perform server-side authentication and user/profile verification.
