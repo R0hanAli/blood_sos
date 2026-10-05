@@ -406,3 +406,127 @@ lib/
 └── main.dart
 
 The exact structure can evolve as additional application modules are introduced.
+
+🖥️ Backend Architecture
+
+The backend is built with Node.js, TypeScript, Express, and Socket.io.
+
+A representative structure:
+
+backend/
+│
+├── src/
+│   ├── controllers/
+│   ├── routes/
+│   ├── services/
+│   ├── middleware/
+│   ├── sockets/
+│   ├── models/
+│   └── config/
+│
+├── .env
+├── package.json
+├── tsconfig.json
+└── ...
+
+Backend Responsibilities
+
+REST API handling
+
+Authentication verification
+
+User/profile management
+
+Blood request management
+
+Request validation
+
+Firebase Admin integration
+
+Firestore operations
+
+Socket.io communication
+
+Real-time event handling
+
+🛠️ Technology Stack
+
+Frontend
+
+Flutter
+
+Dart
+
+Riverpod
+
+GoRouter
+
+Dio
+
+Hive
+
+Backend
+
+Node.js
+
+TypeScript
+
+Express.js
+
+Socket.io
+
+Firebase Admin SDK
+
+Cloud Services
+
+Firebase Authentication
+
+Cloud Firestore
+
+Architecture
+
+REST APIs
+
+WebSockets
+
+Reactive state management
+
+Local caching
+
+Location-aware services
+
+🚀 Getting Started
+
+Prerequisites
+
+Install the following before setting up the project:
+
+Flutter SDK 3.22.0+
+
+Dart SDK
+
+Node.js 18.x+
+
+NPM 9.x+
+
+Android Studio or VS Code
+
+Android Emulator or physical Android device
+
+Firebase project
+
+Firebase Authentication enabled
+
+Cloud Firestore enabled
+
+Verify Flutter:
+
+flutter doctor
+
+Verify Node.js:
+
+node --version
+
+Verify NPM:
+
+npm --version
