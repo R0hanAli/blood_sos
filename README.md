@@ -530,3 +530,100 @@ node --version
 Verify NPM:
 
 npm --version
+
+💻 Backend Setup
+
+1. Navigate to Backend
+
+cd backend
+
+2. Install Dependencies
+
+npm install
+
+3. Configure Environment Variables
+
+Create a .env file inside the backend directory:
+
+PORT=3000
+FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json
+
+Add any additional environment variables required by the current backend implementation.
+
+4. Configure Firebase Admin
+
+From the Firebase Console:
+
+Firebase Console
+      ↓
+Project Settings
+      ↓
+Service Accounts
+      ↓
+Generate New Private Key
+
+Download the service account JSON file and place it inside:
+
+backend/firebase-service-account.json
+
+Do not commit this file to Git.
+
+5. Start Development Server
+
+npm run dev
+
+The backend should start on the configured port.
+
+📱 Flutter Setup
+
+From the project root:
+
+flutter pub get
+
+Configure Firebase for the Flutter application:
+
+flutterfire configure
+
+This generates or updates the Firebase configuration used by the Flutter client.
+
+🌐 Connecting a Physical Device
+
+When running the Flutter application on a physical phone, the phone must be able to reach the development computer running the Node.js backend.
+
+1. Connect Both Devices to the Same Network
+
+Your computer and phone should be connected to the same Wi-Fi network.
+
+2. Find Your Computer's Local IP
+
+On Windows:
+
+ipconfig
+
+Look for the active network adapter's IPv4 address.
+
+Example:
+
+192.168.1.100
+
+3. Update the Flutter API URL
+
+Update the development server address in:
+
+lib/core/network/api_client.dart
+
+For example:
+
+http://192.168.1.100:3000
+
+4. Update Socket.io Configuration
+
+Update the Socket.io server address in:
+
+lib/core/services/providers.dart
+
+Use the same development machine IP and configured backend port.
+
+5. Run Flutter
+
+flutter run
