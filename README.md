@@ -286,3 +286,123 @@ BloodSOS supports structured registration flows for different user roles.
      Donor Flow    Patient Flow   Hospital Flow
 
 The backend uses the Firebase Admin SDK to perform server-side authentication and user/profile verification.
+
+💾 Offline Caching & Fallbacks
+
+BloodSOS uses Hive-based local storage to provide caching and fallback behavior.
+
+This helps the application remain usable when network connectivity is temporarily unavailable or an API endpoint cannot be reached.
+
+Flutter Application
+        │
+        ↓
+    Network Request
+        │
+    ┌───┴────┐
+    ↓        ↓
+ Online    Offline
+    │        │
+    ↓        ↓
+ REST API   Hive Cache
+    │        │
+    └───┬────┘
+        ↓
+    Application
+
+Cached information can help maintain a smoother navigation experience while connectivity is restored.
+
+🛠️ Features
+
+🔐 Multi-Role Authentication
+
+Donor registration
+
+Patient registration
+
+Hospital registration
+
+Role-specific workflows
+
+Firebase Authentication
+
+Server-side profile verification
+
+🚨 Emergency Blood Requests
+
+Create emergency requests
+
+Blood group requirements
+
+Request status management
+
+Hospital/patient request information
+
+Real-time request distribution
+
+⚡ Real-Time Notifications
+
+Socket.io WebSocket communication
+
+Live emergency request updates
+
+Connected donor notifications
+
+Real-time request state changes
+
+📍 Location-Based Discovery
+
+Request locations
+
+Geographic proximity
+
+Map-based request discovery
+
+Location-aware donor workflows
+
+💾 Offline Support
+
+Hive-based caching
+
+Offline navigation fallback
+
+Cached data access
+
+Network-aware application behavior
+
+📱 Cross-Platform Application
+
+Flutter provides a shared application codebase for supported platforms while maintaining a mobile-first experience.
+
+📱 Flutter Architecture
+
+The mobile application uses a layered structure around feature modules and shared application services.
+
+A representative structure is:
+
+lib/
+│
+├── core/
+│   ├── network/
+│   │   └── api_client.dart
+│   │
+│   ├── services/
+│   │   └── ...
+│   │
+│   ├── routing/
+│   └── utils/
+│
+├── features/
+│   ├── authentication/
+│   ├── donors/
+│   ├── patients/
+│   ├── hospitals/
+│   ├── blood_requests/
+│   ├── maps/
+│   └── profile/
+│
+├── providers/
+│   └── providers.dart
+│
+└── main.dart
+
+The exact structure can evolve as additional application modules are introduced.
