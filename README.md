@@ -114,3 +114,95 @@ Backend Firebase Access
 Firebase Admin SDK
 
 Server-side Firebase operations
+
+👥 User Roles
+
+BloodSOS is designed around multiple user types with role-specific workflows.
+
+🩸 Donor
+
+Donors can:
+
+Create a donor account
+
+Maintain their donor profile
+
+Provide relevant blood information
+
+Discover emergency blood requests
+
+Receive real-time notifications
+
+View request locations
+
+Respond to suitable requests
+
+🧑‍⚕️ Patient
+
+Patients can:
+
+Register and manage their profile
+
+Create emergency blood requests
+
+Specify required blood information
+
+View request status
+
+Receive relevant updates
+
+🏥 Hospital
+
+Hospitals can:
+
+Register as a healthcare organization
+
+Create emergency blood requests
+
+Provide request information
+
+Monitor emergency requests
+
+Receive donor responses
+
+Manage request-related information
+
+🚨 Emergency Blood Requests
+
+The core functionality of BloodSOS is its emergency request system.
+
+A typical workflow is:
+
+Create Blood Request
+        ↓
+Request Validation
+        ↓
+Request Published
+        ↓
+Location / Eligibility Matching
+        ↓
+Socket.io Notification
+        ↓
+Nearby Eligible Donors
+        ↓
+Donor Response
+        ↓
+Request Status Updated
+
+Emergency requests can contain relevant information such as:
+
+Blood group
+
+Required quantity
+
+Request urgency
+
+Patient information
+
+Hospital information
+
+Request location
+
+Contact information
+
+Request status
